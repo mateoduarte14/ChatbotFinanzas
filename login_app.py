@@ -56,11 +56,11 @@ def show_finance_section():
         import datetime
         st.session_state.date = datetime.date.today()
 
-    expense = st.text_input("Detalle", key="expense", value=st.session_state.expense)
+    expense = st.text_input("Detalle", key="expense")
     category = st.selectbox("Categoria", ["Comida", "Transporte", "Entretenimiento", "Alquiler", "Prestamo", "Other"], key="category", index=["Comida", "Transporte", "Entretenimiento", "Alquiler", "Prestamo", "Other"].index(st.session_state.category))
-    amount = st.number_input("Cantidad", key="amount", value=st.session_state.amount)
-    type = st.radio("Tipo", ["Ingreso", "Egreso"], key="type", index=["Ingreso", "Egreso"].index(st.session_state.type))
-    date = st.date_input("Fecha", key="date", value=st.session_state.date)
+    amount = st.number_input("Cantidad", key="amount")
+    type = st.radio("Tipo", ["Ingreso", "Egreso"], key="type")
+    date = st.date_input("Fecha", key="date")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -95,12 +95,14 @@ def show_finance_section():
         # Create a dataframe from the data
         df = pd.DataFrame(data, columns=["Detalle", "Categoria", "Cantidad", "Tipo", "Fecha"])
 
-        # Create pie charts
+        # Filter data for income and expense
         income_data = df[df["Tipo"] == "Ingreso"]
         expense_data = df[df["Tipo"] == "Egreso"]
 
         # Calculate income by category
         income_by_category = income_data.groupby("Categoria")["Cantidad"].sum()
+
+        # Create income pie chart
         fig_income = go.Figure(data=[go.Pie(labels=income_by_category.index, values=income_by_category.values)])
         fig_income.update_layout(title_text="Ingresos por Categoria")
         st.plotly_chart(fig_income)
@@ -167,7 +169,7 @@ def add_gemini_chatbot():
         response = model.generate_content(prompt)
         short_response = response.text[:100]
         # Add assistant message to chat history
-        st.session_state.messages.append({"role": "Eres un asistente financiero inteligente que ayuda a los usuarios a gestionar sus finanzas personales. Tu objetivo es proporcionar análisis claros y consejos basados en los ingresos y gastos del usuario. Cuando el usuario ingrese información sobre sus transacciones, responde con un resumen útil, detecta patrones de gasto y sugiere formas de optimizar su presupuesto. Sé claro, conciso y proactivo en tus recomendaciones.", "content": response.text})
+        st.session_state.messages.append({"role": "Eres un asistente financiero inteligente que ayuda a los usuarios a gestionar sus finanzas personales. Tu objetivo es proporcionar análisis claros y consejos basados en los ingresos y gastos del usuario. Sé claro, conciso y proactivo en tus recomendaciones.", "content": response.text})
         # Display assistant message in chat message container
         with st.chat_message("assistant"):
             st.markdown(response.text)
